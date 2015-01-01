@@ -5,7 +5,6 @@
 
 # Python 3 is required
 
-import copy
 import sys
 
 from datetime import datetime

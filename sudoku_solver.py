@@ -115,7 +115,7 @@ def solve(x, old_i=-1, old_j=-1):
 Enter data.
 '''
 # '0' means an unknown value.
-sudoku = """0 8 0 0 0 0 0 0 0
+sudoku = """8 0 0 0 0 0 0 0 0
             0 0 3 6 0 0 0 0 0
             0 7 0 0 9 0 2 0 0
             0 5 0 0 0 7 0 0 0

@@ -8,6 +8,7 @@
 import sys
 
 from datetime import datetime
+from functools import reduce
 
 def create_link_map(n):
     region_n = int(n**(.5))
@@ -42,20 +43,16 @@ def create_link_map(n):
         m.append(column)
     return m
 
-def set_value(x, value, i, j, log):
-    try:
-        l = []
-        log.append([x[i][j], value, i, j, l])
-    except AttributeError:
-        pass
+def set_value(x, value, i, j):
     x[i][j] = temp_values_list[-value - 1]
+    z.remove(z_map[i][j])
 
     # Remove this element from 
     # other linked ceils.
     for a, b in link_map[i][j]:
         try:
             x[a][b].remove(value)
-            l.append(a << 16 | b) # Remember the ceil's location
+            z_map[a][b][0] -= 1
         except ValueError:
             pass
 
@@ -65,48 +62,52 @@ def restore(x, log):
         for a in l:
             x[a >> 16][a & (1 << 16) - 1].append(value)
  
-def solve(x, old_i=-1, old_j=-1):
+def solve(x):
     global iterations
     iterations += 1
     if not iterations % 10000:
-        print('%d...' % iterations) 
-    # Try to find best next position.
-    min_size = sudoku_length + 1
-    for a, b in link_map[old_i][old_j]:
-        size = len(x[a][b])
-        if size:
-            if size < min_size: 
-                if size != 1 or x[a][b][0] < 0:
-                    min_size, i, j = size, a, b
-        else:
-            # Found an empty ceil with no
-            # possible values.
-            return None
-    if min_size > sudoku_length:
-        # Search over all ceils.
-        for a, b in range_99:
-            size = len(x[a][b])
-            if size:
-                if size < min_size: 
-                    if size != 1 or x[a][b][0] < 0:
-                        min_size, i, j = size, a, b
-            else:
-                # Found an empty ceil with no
-                # possible values.
-                return None
-        if min_size > sudoku_length:
-            # Found the solution!
-            return x
+        print('%d...' % iterations)
+    if not len(z):
+        # Found the solution!
+        return x
+    z_item = z[0]
+    if  z_item[0] <= 0:
+        # Found an empty ceil with no
+        # possible values.
+        return None
+    i, j = z_item[1], z_item[2]
+    # Remove this ceil.
+    del z[0]
     # Try all possibilities.
-    for e in x[i][j]:
-        log = []
-        set_value(x, e, i, j, log)
+    x_value = x[i][j]
+    for value in x_value:
+        x[i][j] = temp_values_list[-value - 1]
 
-        r = solve(x, i, j)
-        if r is None:
-            restore(x, log)
-            continue
-        return r
+        # Remove this element from 
+        # other linked ceils.
+        log = []
+        for a, b in link_map[i][j]:
+            try:
+                x[a][b].remove(value)
+                log.append(a << 16 | b) # Remember the ceil's location
+                z_map[a][b][0] -= 1
+            except ValueError:
+                pass
+        z.sort(key=lambda e : e[0])
+
+        # Try to solve it.
+        if not solve(x) is None:
+            return x
+
+        # Restore everything.
+        x[i][j] = x_value
+        for k in log:
+            a, b = k >> 16, k & (1 << 16) - 1
+            x[a][b].append(value)
+            z_map[a][b][0] += 1
+        z.sort(key=lambda e : e[0])
+    # Put the ceil back.
+    z.insert(0, z_item)
     return None
 
 '''
@@ -143,18 +144,39 @@ iterations = 0
 
 # Link everything
 link_map = create_link_map(sudoku_length)
+
+z_map = [[[float(len(link_map[i][j])), i, j] for j in range_9] for i in range_9]
+z = []
+for e in z_map:
+    z.extend(e)
+k = max(e[0] for e in z) + 2
+for e in z:
+     e[0] = sudoku_length - e[0] / k
+z.sort(key=lambda e : e[0])
+
 # Create the list of posibilities.
 x = [[list(range(-sudoku_length, 0)) for j in range_9] for i in range_9]
 # Apply the initial sudoku.
 for i, j in range_99:
-    e = sudoku[i][j]
-    if e:
-        if -e in x[i][j]:
-            set_value(x, -e, i, j, None)
+    value = sudoku[i][j]
+    #print(e)
+    if value:
+        if -value in x[i][j]:
+            x[i][j] = temp_values_list[-value - 1]
+            z.remove(z_map[i][j])
+        
+            # Remove this element from 
+            # other linked ceils.
+            for a, b in link_map[i][j]:
+                try:
+                    x[a][b].remove(value)
+                    z_map[a][b][0] -= 1
+                except ValueError:
+                    pass
+            set_value(x, -value, i, j)
         else:
             print('The sudoku is incorrect!')
-            print('Could not place %d in [%d;%d]!' % (e, j + 1, i + 1))
-            #print('\n'.join([' '.join([str(e) for e in r]) for r in x]))
+            print('Could not place %d in [%d;%d]!' % (value, j + 1, i + 1))
             sys.exit()
 sudoku = None
 # Solve

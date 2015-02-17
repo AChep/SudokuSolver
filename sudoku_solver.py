@@ -162,17 +162,6 @@ for i, j in range_99:
     #print(e)
     if value:
         if -value in x[i][j]:
-            x[i][j] = temp_values_list[-value - 1]
-            z.remove(z_map[i][j])
-        
-            # Remove this element from 
-            # other linked ceils.
-            for a, b in link_map[i][j]:
-                try:
-                    x[a][b].remove(value)
-                    z_map[a][b][0] -= 1
-                except ValueError:
-                    pass
             set_value(x, -value, i, j)
         else:
             print('The sudoku is incorrect!')

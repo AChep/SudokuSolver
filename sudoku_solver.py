@@ -152,7 +152,6 @@ for e in z_map:
 k = max(e[0] for e in z) + 2
 for e in z:
      e[0] = sudoku_length - e[0] / k
-z.sort(key=lambda e : e[0])
 
 # Create the list of posibilities.
 x = [[list(range(-sudoku_length, 0)) for j in range_9] for i in range_9]
@@ -169,6 +168,7 @@ for i, j in range_99:
             sys.exit()
 sudoku = None
 # Solve
+z.sort(key=lambda e : e[0])
 x = solve(x)
 
 '''

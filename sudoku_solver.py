@@ -52,12 +52,6 @@ def set_value(x, value, i, j):
             z_map[a][b][0] -= 1
         except ValueError:
             pass
-
-def restore(x, log):
-    for e, value, i, j, l in log:
-        x[i][j] = e
-        for a in l:
-            x[a >> 16][a & (1 << 16) - 1].append(value)
  
 def solve(x):
     global iterations

@@ -13,31 +13,28 @@ from functools import reduce
 def create_link_map(n):
     region_n = int(n**(.5))
     region_range = [[i // region_n, i % region_n] for i in range(n)]
-    # Create initial map of links, so
-    # we may multiply use those.
-    w = [[[i, j] for j in range_9] for i in range_9]
     m = []
     for i in range_9:
         column = []
         for j in range_9:
             ceil = []
             # Add row.
-            ceil.extend([w[e][j] for e in range_9 if e != i])
+            ceil.extend([[e, j] for e in range_9 if e != i])
             # Add column.
-            ceil.extend([w[i][e] for e in range_9 if e != j])
+            ceil.extend([[i, e] for e in range_9 if e != j])
             # Add region.
             for a, b in region_range:
                 x = a + i // region_n * region_n;
                 y = b + j // region_n * region_n;
                 if x != i and y != j:
-                    ceil.append(w[x][y])
+                    ceil.append([x, y])
             '''
             # Add main diagonal.
             if i == j:
-                ceil.extend([w[e][e] for e in range_9 if e != i])
+                ceil.extend([[e, e] for e in range_9 if e != i])
             # Add sub-diagonal.
             if i == n - j - 1:
-                ceil.extend([w[e][n - e - 1] for e in range_9 if e != j])
+                ceil.extend([[e, n - e - 1] for e in range_9 if e != j])
             '''
             column.append(ceil)
         m.append(column)

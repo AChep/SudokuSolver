@@ -6,6 +6,23 @@
 # Python 3 is required
 
 
+class Clue:
+    """
+    A clue for solving the sudoku.
+
+    Attributes:
+        x              The X coordinate in a matrix of sudoku.
+        y              The Y coordinate in a matrix of sudoku.
+        possibilities  The list of possible values.
+    """
+    x = 0
+    y = 0
+    possibilities = []
+
+    def __str__(self):
+        return '(x=%d y=%d possibilities=%s)' % (self.x, self.y, self.possibilities)
+
+
 class Sudoku:
     def __init__(self, sudoku="""8 0 0 0 0 0 0 0 0
                                  0 0 3 6 0 0 0 0 0
@@ -103,14 +120,13 @@ class Sudoku:
     def clue(self):
         """
         :return:
-        The list of three items:
-            1. X coordinate.
-            2. Y coordinate.
-            3. List of possible values.
+        The best possible step.
         """
-        clue = self._depth_line[0]
-        i, j = clue[1], clue[2]
-        return [i, j, [-e for e in self._x[i][j]]]
+        clue = Clue()
+        clue.x = self._depth_line[0][1]
+        clue.y = self._depth_line[0][2]
+        clue.possibilities = [-e for e in self._x[clue.x][clue.y]]
+        return clue
 
     def solve(self):
         """

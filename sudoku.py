@@ -117,7 +117,7 @@ class Sudoku:
         # Re-sort the depth map.
         self._depth_line.sort(key=lambda e: e[0])
 
-    def clue(self):
+    def clue(self, fast_search=True):
         """
         :return:
         The best possible step.

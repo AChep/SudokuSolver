@@ -5,7 +5,10 @@
 
 # Python 3 is required
 
+import sys
 import itertools
+
+from datetime import datetime
 
 
 class Clue:
@@ -189,3 +192,30 @@ class Sudoku:
     @staticmethod
     def format(x):
         return '\n'.join([' '.join([str(e[0]) for e in row]) for row in x])
+
+
+def solve(text):
+    now = datetime.now()
+    sudoku = Sudoku(text)
+    solved = sudoku.solve()
+    if solved:
+        divider = ' '.join('-' for i in range(len(sudoku.solution)))
+        print('The sudoku has been solved:')
+        print(divider)
+        print(Sudoku.format(sudoku.solution))
+        # noinspection PyUnusedLocal
+        print(divider)
+        print('Elapsed real time: %ss.' % (datetime.now() - now).total_seconds())
+    else:
+        print('Failed to solve!')
+
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        with open(sys.argv[1], 'r') as file:
+            data = file.read()
+        print(data)
+        print()
+        solve(data)
+    else:
+        solve('\n'.join([input('Line #%d: ' % (i + 1)) for i in range(int(input('Enter the size of the sudoku: ')))]))

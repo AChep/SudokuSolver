@@ -5,6 +5,8 @@
 
 # Python 3 is required
 
+import itertools
+
 
 class Clue:
     """
@@ -43,24 +45,16 @@ class Sudoku:
         self._matrix = [[i // self._n, i % self._n] for i in range(self._n ** 2)]
         self._link_map = self._create_link_map(diagonal)
 
-        '''
-        Create the depth matrix & flat line. The depth variable is needed to
-        simplify the best-position-search.
-        '''
+        # Depth matrix.
         self._depth_matrix = [[[float(len(self._link_map[i][j])), i, j] for j in self._line] for i in self._line]
-        self._depth_line = []
-        # Extract the matrix into a line.
-        for e in self._depth_matrix:
-            self._depth_line.extend(e)
+        self._depth_line = list(itertools.chain.from_iterable(self._depth_matrix))
         # Calculate the current depth state. Initially, the ceil with most links is
         # the best choice to set into.
         k = max(e[0] for e in self._depth_line) + 2
         for e in self._depth_line:
             e[0] = self._n - e[0] / k
 
-        '''
-        Create the possibilities matrix.
-        '''
+        # Superposition matrix.
         # noinspection PyUnusedLocal
         self._x = [[list(range(-self._n, 0)) for j in self._line] for i in self._line]
         # Apply the initial values.
@@ -105,9 +99,9 @@ class Sudoku:
     def set(self, value, x, y):
         """
 
-        :param value: Value to be set
-        :param x: X coordinate
-        :param y: Y coordinate
+        :param value: The value to be set
+        :param x: The X coordinate
+        :param y: The Y coordinate
         """
         if 0 < value <= self._n and -value in self._x[x][y]:
             self._set(-value, x, y)
@@ -140,17 +134,18 @@ class Sudoku:
         return bool(solution)
 
     def _solve(self):
-        if not len(self._depth_line):
-            # Found the solution!
+        if not self._depth_line:
             return self._x
+
+        # Choose the best candidate.
         clue = self._depth_line[0]
-        if clue[0] <= 0:
+        if not clue[0]:
             # Found an empty ceil with no
             # possible values.
             return None
         i, j = clue[1], clue[2]
-        # Remove this ceil.
         del self._depth_line[0]
+
         # Try all possibilities.
         x_value = self._x[i][j]
         for value in x_value:
@@ -159,18 +154,17 @@ class Sudoku:
             self._depth_line.sort(key=lambda e: e[0])
 
             # Try to solve it.
-            if not self._solve() is None:
+            if self._solve() is not None:
                 return self._x
 
-            # Restore everything.
-            self._x[i][j] = x_value
+            # Restore.
             for k in log:
                 a, b = k >> 16, k & (1 << 16) - 1
                 self._x[a][b].append(value)
                 self._depth_matrix[a][b][0] += 1
-            self._depth_line.sort(key=lambda e: e[0])
-        # Put the ceil back.
+        self._x[i][j] = x_value
         self._depth_line.insert(0, clue)
+        self._depth_line.sort(key=lambda e: e[0])
         return None
 
     def _set(self, value, i, j, fallback=None):

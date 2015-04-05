@@ -4,9 +4,9 @@ SudokuSolver
 <img alt="Default sudoku" align="right" height="300"
    src="https://github.com/AChep/SudokuSolver/raw/master/art/sudoku.jpg" />
 
-This sudoku solver has been written just for fun by a Python noob. It can solve the hardest sudoku-s in less than half a second (for example, it solves the AI top 10 in 1.3 s.)
+This Sudoku solver has been written just for fun by a Python noob. It can solve the hardest Sudokus in less than half a second (for example, it solves the _AI top 10_ in _1.3s_.)
 
-PS: The puzzle may be 2x2, 4x4, 9x9, 16x16, 25x25, ... , n^2xn^2 
+**PS**: The puzzle may be 2x2, 4x4, 9x9, 16x16, 25x25, ..., _n^2xn^2_
 
 <a href="http://get.acdisplay.org">
 </a> <a href="bitcoin:1GYj49ZnMByKj2f6p7r4f92GQi5pR6BSMz?amount=0.005">
@@ -30,16 +30,16 @@ Checklist for creating issues:
 
 [Create new issue][1]
 
-How to solve a sudoku?
+How to solve a Sudoku?
 ----------------
-To enter the sudoku from a console:
+To enter the Sudoku from a console:
 
 ``` bash
 $ python sudoku.py
-# It will ask you to enter the sudoku.
+# It will ask you to enter the Sudoku.
 ```
 
-To load the sudoku from a file:
+To load the Sudoku from a file:
 
 ``` bash
 $ python sudoku.py filename.txt

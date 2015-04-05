@@ -182,11 +182,12 @@ class Sudoku:
         clue.possibilities = [-e for e in ceil.value]
         return clue
 
-    def solve(self):
+    def solve(self, guess=False):
         while self.cells_line:
             # Choose the best candidate.
             ceil = self.cells_line[0]
-            if len(ceil.value) != 1:
+            size = len(ceil.value)
+            if not size or not guess and size != 1:
                 # Found an empty ceil with no
                 # possible values.
                 return False

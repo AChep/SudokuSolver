@@ -49,7 +49,6 @@ class _Ceil:
         return True
 
 
-# TODO: Locked candidate.
 class _Group:
     def __init__(self, cells, data):
         self.data = data
@@ -66,13 +65,13 @@ class _Group:
         # Remove the ceil from list.
         self.cells.remove(ceil)
 
-        # Hidden loners.
+        # Hidden singles
         self.depth[value - 1] = -self.data.size
         for i in ceil.ghost:
             self.depth[-i - 1] += 1
 
     def on_ceil_value_set(self, ceil, value):
-        # Open loners.
+        # Naked singles
         for i in self.cells:
             i.abandon(-value)
 
@@ -84,10 +83,10 @@ class _Group:
             self.pairs[key] = self.data.size - 1
 
     def on_ceil_value_abandoned(self, ceil, value):
-        # Hidden loners.
+        # Hidden singles
         self.depth[-value - 1] += 1
 
-        # Open pairs
+        # Naked pairs/triples/etc
         has_open_pairs = False
         key = frozenset(ceil.value)
         try:
@@ -97,42 +96,42 @@ class _Group:
         except KeyError:
             self.pairs[key] = 1
 
-        # Locked candidate.
-        lc = []
-        possibly_has_locked_candidates = self.data.size > self.depth[-value - 1] > 0
+        # Pointing pairs/triples
+        pointing_cells = []
+        possibly_pointing = self.data.size > self.depth[-value - 1] > 0
 
         for i in self.cells:
             if i is ceil:
                 continue
-            # Hidden loners.
+            # Hidden singles
             if self.depth[-value - 1] == self.data.size and value in i.value:
                 # Simplify the superposition.
                 for k in i.value:
                     if k != value:
                         i.abandon(k)
-            # Open pairs.
+            # Naked pairs/triples/etc
             if has_open_pairs and ceil.value in i.value:
                 # Simplify the superposition.
                 for k in ceil.value:
                     if k not in i.value:
                         i.abandon(k)
-            # Locked candidate.
-            if possibly_has_locked_candidates and value in i.value:
-                lc.append(i)
+            # Pointing pairs/triples
+            if possibly_pointing and value in i.value:
+                pointing_cells.append(i)
             continue
 
-        # Locked candidate.
-        if lc:
-            groups = list(lc[0].groups)
+        # Pointing pairs/triples
+        if pointing_cells:
+            groups = list(pointing_cells[0].groups)
             groups.remove(self)
-            for i in lc:
+            for i in pointing_cells:
                 groups[:] = [j for j in groups if j in i.groups]
                 if not groups:
                     break
             else:
                 for i in groups:
                     for j in i.cells:
-                        if j not in lc:
+                        if j not in pointing_cells:
                             j.abandon(value)
 
 

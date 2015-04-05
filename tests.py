@@ -128,14 +128,17 @@ array = [
 
 n = 100
 s = 0
+f = 0
 for j in range(n):
     now = datetime.now()
     for i in array:
         sudoku = Sudoku(i)
         solved = sudoku.solve()
         if not solved and not j:
+            f += 1
             print("Failed to solve: \n%s" % '\n'.join([row.strip() for row in i.split('\n')]))
     delta = (datetime.now() - now).total_seconds()
     s += delta
 print('Elapsed real time %fs.' % s)
 print('Average real time %fs.' % (s / n))
+print('Failed %d of %d sudoku-s.' % (f, len(array)))

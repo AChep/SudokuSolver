@@ -99,7 +99,8 @@ class _Group:
             self.pairs[key] = 1
 
         # Pointing pairs/triples
-        pointing_cells = []
+        pointing_cells = None
+        pointing_groups = None
         possibly_pointing = size > self.depth[-value - 1] > size - size ** 0.5
 
         for i in self.cells:
@@ -119,22 +120,22 @@ class _Group:
                         i.abandon(k)
             # Pointing pairs/triples
             if possibly_pointing and value in i.value:
+                if pointing_cells is None:
+                    pointing_cells = []
+                    pointing_groups = list(i.groups)
+                    pointing_groups.remove(self)
+                else:
+                    pointing_groups[:] = [j for j in pointing_groups if j in i.groups]
+                    possibly_pointing = bool(pointing_groups)
                 pointing_cells.append(i)
             continue
 
         # Pointing pairs/triples
-        if pointing_cells:
-            groups = list(pointing_cells[0].groups)
-            groups.remove(self)
-            for i in pointing_cells:
-                groups[:] = [j for j in groups if j in i.groups]
-                if not groups:
-                    break
-            else:
-                for i in groups:
-                    for j in i.cells:
-                        if j not in pointing_cells:
-                            j.abandon(value)
+        if pointing_groups:
+            for i in pointing_groups:
+                for j in i.cells:
+                    if j not in pointing_cells:
+                        j.abandon(value)
 
 
 class Sudoku:

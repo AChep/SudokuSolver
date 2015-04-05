@@ -100,7 +100,7 @@ class _Group:
 
         # Pointing pairs/triples
         pointing_cells = []
-        possibly_pointing = size > self.depth[-value - 1] > 0
+        possibly_pointing = size > self.depth[-value - 1] > size - size ** 0.5
 
         for i in self.cells:
             if i is ceil:

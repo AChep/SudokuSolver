@@ -134,7 +134,7 @@ for j in range(n):
         sudoku = Sudoku(i)
         solved = sudoku.solve()
         if not solved:
-            print("Failed to solve: \n%s" % i)
+            print("Failed to solve: \n%s" % '\n'.join([row.strip() for row in i.split('\n')]))
     delta = (datetime.now() - now).total_seconds()
     s += delta
 print('Elapsed real time %fs.' % s)

@@ -133,7 +133,7 @@ for j in range(n):
     for i in array:
         sudoku = Sudoku(i)
         solved = sudoku.solve()
-        if not solved:
+        if not solved and not j:
             print("Failed to solve: \n%s" % '\n'.join([row.strip() for row in i.split('\n')]))
     delta = (datetime.now() - now).total_seconds()
     s += delta

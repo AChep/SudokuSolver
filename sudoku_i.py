@@ -116,25 +116,25 @@ class Sudoku:
         # Parse the source of a sudoku.
         sudoku = [[int(e) for e in row.split()] for row in sudoku.split('\n')]
 
-        self.data = _Data()
-        self.data.i = 0
-        self.data.log = []
-        self.data.size = len(sudoku)
-        line = list(range(self.data.size))
-        region_size = int(self.data.size ** .5)
+        self._data = _Data()
+        self._data.i = 0
+        self._data.log = []
+        self._data.size = len(sudoku)
+        line = list(range(self._data.size))
+        region_size = int(self._data.size ** .5)
         region = [[i // region_size, i % region_size] for i in line]
 
         # Create the cells.
         # noinspection PyUnusedLocal
-        self.cells = [[_Ceil(self.data) for j in line] for i in line]
-        self.cells_line = list(itertools.chain.from_iterable(self.cells))
+        self._cells = [[_Ceil(self._data) for j in line] for i in line]
+        self._cells_line = list(itertools.chain.from_iterable(self._cells))
 
         # Create the groups.
         for j in line:
             # Add a row.
-            _Group([self.cells[e][j] for e in line], self.data)
+            _Group([self._cells[e][j] for e in line], self._data)
             # Add a column.
-            _Group([self.cells[j][e] for e in line], self.data)
+            _Group([self._cells[j][e] for e in line], self._data)
         # Add regions.
         for i, j in region:
             r = []
@@ -142,29 +142,29 @@ class Sudoku:
                 x = a + i * region_size
                 y = b + j * region_size
                 r.append([x, y])
-            _Group([self.cells[e[0]][e[1]] for e in r], self.data)
+            _Group([self._cells[e[0]][e[1]] for e in r], self._data)
 
         # Apply the initial values.
         for i in line:
             for j in line:
                 v = sudoku[i][j]
                 if v:
-                    self.cells[i][j].set(v)
-                    self.cells_line.remove(self.cells[i][j])
+                    self._cells[i][j].set(v)
+                    self._cells_line.remove(self._cells[i][j])
 
         # Sort the best positions.
-        self.cells_line.sort(key=lambda e: len(e.value))
+        self._cells_line.sort(key=lambda e: len(e.value))
 
     def clue(self):
-        if not self.cells_line:
+        if not self._cells_line:
             return None  # The sudoku is solved.
-        ceil = self.cells_line[0]
+        ceil = self._cells_line[0]
         # noinspection PyUnresolvedReferences
-        line = list(range(self.data.size))
+        line = list(range(self._data.size))
         try:
             for a in line:
                 for b in line:
-                    if self.cells[a][b] is ceil:
+                    if self._cells[a][b] is ceil:
                         i, j = a, b
                         # Break both loops.
                         raise LookupError()
@@ -183,21 +183,21 @@ class Sudoku:
         return clue
 
     def solve(self, guess=False):
-        while self.cells_line:
+        while self._cells_line:
             # Choose the best candidate.
-            ceil = self.cells_line[0]
+            ceil = self._cells_line[0]
             size = len(ceil.value)
             if not size or not guess and size != 1:
                 # Found an empty ceil with no
                 # possible values.
                 return False
-            del self.cells_line[0]
+            del self._cells_line[0]
 
             value = ceil.value[0]
             ceil.set(-value)
-            self.cells_line.sort(key=lambda e: len(e.value))
+            self._cells_line.sort(key=lambda e: len(e.value))
         return True
 
     @property
     def solution(self):
-        return [[i.value for i in row] for row in self.cells]
+        return [[i.value for i in row] for row in self._cells]

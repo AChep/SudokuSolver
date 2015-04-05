@@ -197,3 +197,7 @@ class Sudoku:
             ceil.set(-value)
             self.cells_line.sort(key=lambda e: len(e.value))
         return True
+
+    @property
+    def solution(self):
+        return [[i.value for i in row] for row in self.cells]

@@ -83,6 +83,8 @@ class _Group:
             self.pairs[key] = self.data.size - 1
 
     def on_ceil_value_abandoned(self, ceil, value):
+        size = self.data.size
+
         # Hidden singles
         self.depth[-value - 1] += 1
 
@@ -98,13 +100,13 @@ class _Group:
 
         # Pointing pairs/triples
         pointing_cells = []
-        possibly_pointing = self.data.size > self.depth[-value - 1] > 0
+        possibly_pointing = size > self.depth[-value - 1] > 0
 
         for i in self.cells:
             if i is ceil:
                 continue
             # Hidden singles
-            if self.depth[-value - 1] == self.data.size and value in i.value:
+            if self.depth[-value - 1] == size and value in i.value:
                 # Simplify the superposition.
                 for k in i.value:
                     if k != value:

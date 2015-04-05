@@ -216,7 +216,8 @@ class Sudoku:
             size = len(ceil.value)
             if not size or not guess and size != 1:
                 # Found an empty ceil with no
-                # possible values.
+                # possible values or the ceil
+                # with multiple possible values.
                 return False
             del self._cells_line[0]
 

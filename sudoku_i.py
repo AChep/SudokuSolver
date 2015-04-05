@@ -28,6 +28,9 @@ class _Ceil:
         self.value = [value]
         # Notify the groups.
         for i in self.groups:
+            i.on_ceil_value_set_pre(self, value)
+        # Notify the groups.
+        for i in self.groups:
             i.on_ceil_value_set(self, value)
 
     def abandon(self, value):
@@ -59,7 +62,7 @@ class _Group:
         # Create pairs dict.
         self.pairs = {}
 
-    def on_ceil_value_set(self, ceil, value):
+    def on_ceil_value_set_pre(self, ceil, value):
         # Remove the ceil from list.
         self.cells.remove(ceil)
 
@@ -68,6 +71,7 @@ class _Group:
         for i in ceil.ghost:
             self.depth[-i - 1] += 1
 
+    def on_ceil_value_set(self, ceil, value):
         # Open loners.
         for i in self.cells:
             i.abandon(-value)
@@ -93,6 +97,10 @@ class _Group:
         except KeyError:
             self.pairs[key] = 1
 
+        # Locked candidate.
+        lc = []
+        possibly_has_locked_candidates = self.data.size > self.depth[-value - 1] > 0
+
         for i in self.cells:
             if i is ceil:
                 continue
@@ -108,7 +116,24 @@ class _Group:
                 for k in ceil.value:
                     if k not in i.value:
                         i.abandon(k)
+            # Locked candidate.
+            if possibly_has_locked_candidates and value in i.value:
+                lc.append(i)
             continue
+
+        # Locked candidate.
+        if lc:
+            groups = list(lc[0].groups)
+            groups.remove(self)
+            for i in lc:
+                groups[:] = [j for j in groups if j in i.groups]
+                if not groups:
+                    break
+            else:
+                for i in groups:
+                    for j in i.cells:
+                        if j not in lc:
+                            j.abandon(value)
 
 
 class Sudoku:

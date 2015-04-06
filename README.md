@@ -8,8 +8,7 @@ This Sudoku solver has been written just for fun by a Python noob. It can solve 
 
 **PS**: The puzzle may be 2x2, 4x4, 9x9, 16x16, 25x25, ..., _n^2xn^2_
 
-<a href="http://get.acdisplay.org">
-</a> <a href="bitcoin:1GYj49ZnMByKj2f6p7r4f92GQi5pR6BSMz?amount=0.005">
+<a href="bitcoin:1GYj49ZnMByKj2f6p7r4f92GQi5pR6BSMz?amount=0.005">
   <img alt="Bitcoin wallet: 1GYj49ZnMByKj2f6p7r4f92GQi5pR6BSMz" vspace="28" hspace="20"
        src="https://github.com/AChep/SudokuSolver/raw/master/art/btn_bitcoin.png" />
 </a> <a href="http://goo.gl/UrecGo">

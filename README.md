@@ -1,5 +1,6 @@
 SudokuSolver
 ============
+[![Support at gratipay](http://img.shields.io/gratipay/AChep.svg)](https://gratipay.com/AChep/)
 
 <img alt="Default sudoku" align="right" height="300"
    src="https://github.com/AChep/SudokuSolver/raw/master/art/sudoku.jpg" />
@@ -7,8 +8,6 @@ SudokuSolver
 This Sudoku solver has been written just for fun by a Python noob. It can solve the hardest Sudokus in less than half a second (for example, it solves the _AI top 10_ in _1.3s_.)
 
 **PS**: The puzzle may be 2x2, 4x4, 9x9, 16x16, 25x25, ..., _n^2xn^2_
-
-[![Support at gratipay](http://img.shields.io/gratipay/AChep.svg)](https://gratipay.com/AChep/)
 
 <a href="bitcoin:1GYj49ZnMByKj2f6p7r4f92GQi5pR6BSMz?amount=0.005">
   <img alt="Bitcoin wallet: 1GYj49ZnMByKj2f6p7r4f92GQi5pR6BSMz" vspace="28" hspace="20"

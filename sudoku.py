@@ -41,7 +41,7 @@ class Sudoku:
         sudoku = [[int(e) for e in row.split()] for row in sudoku.split('\n')]
         self._n = len(sudoku)
         for row in sudoku:
-            if len(row) is not self._n:
+            if len(row) != self._n:
                 raise ValueError("The sudoku is missing some values.")
         # Basics.
         self._line = range(self._n)

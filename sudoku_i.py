@@ -58,8 +58,6 @@ class _Group:
             ceil.groups.append(self)
         # Create depth map.
         self.depth = [1] * data.size
-        # Create pairs dict.
-        self.pairs = {}
 
     def on_ceil_value_set_pre(self, ceil, value):
         # Remove the ceil from list.
@@ -76,27 +74,13 @@ class _Group:
             i.abandon(-value)
 
     def on_ceil_value_abandoned_pre(self, ceil, value):
-        key = frozenset(ceil.value)
-        try:
-            self.pairs[key] -= 1
-        except KeyError:
-            self.pairs[key] = self.data.size - 1
+        pass
 
     def on_ceil_value_abandoned(self, ceil, value):
         size = self.data.size
 
         # Hidden singles
         self.depth[-value - 1] += 1
-
-        # Naked pairs/triples/etc
-        has_open_pairs = False
-        key = frozenset(ceil.value)
-        try:
-            self.pairs[key] += 1
-            if self.pairs[key] == len(ceil.value) > 1:
-                has_open_pairs = True
-        except KeyError:
-            self.pairs[key] = 1
 
         # Pointing pairs/triples
         pointing_cells = None
@@ -113,7 +97,7 @@ class _Group:
                     if k != value:
                         i.abandon(k)
             # Naked pairs/triples/etc
-            if has_open_pairs and ceil.value in i.value:
+            if ceil.value in i.value:
                 # Simplify the superposition.
                 for k in ceil.value:
                     if k not in i.value:

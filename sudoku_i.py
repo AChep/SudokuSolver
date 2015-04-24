@@ -77,49 +77,66 @@ class _Group:
         pass
 
     def on_ceil_value_abandoned(self, ceil, value):
-        size = self.data.size
-
-        # Hidden singles
         self.depth[-value - 1] += 1
+        # Use different methods to choose the best ceil/value.
+        self._method_hidden_singles(ceil, value)
+        self._method_naked_pairs_triples(ceil, value)
+        self._method_pointing_pairs_triples(ceil, value)
 
-        # Pointing pairs/triples
-        pointing_cells = None
-        pointing_groups = None
-        possibly_pointing = size > self.depth[-value - 1] > size - size ** 0.5
+    def _method_hidden_singles(self, ceil, value):
+        """
+        Hidden Single means that for a given digit and house only one cell
+        is left to place that digit. The cell itself has more than one candidate
+        left, the correct digit is thus hidden amongst the rest.
 
+        This is the same as the Pointing Singles.
+        """
+        if self.depth[-value - 1] == self.data.size:
+            for i in self.cells:
+                if i is ceil:
+                    continue
+                if value in i.value:
+                    # Simplify the superposition.
+                    for k in i.value:
+                        if k != value:
+                            i.abandon(k)
+                    break
+
+    def _method_naked_pairs_triples(self, ceil, value):
         for i in self.cells:
             if i is ceil:
                 continue
-            # Hidden singles
-            if self.depth[-value - 1] == size and value in i.value:
-                # Simplify the superposition.
-                for k in i.value:
-                    if k != value:
-                        i.abandon(k)
-            # Naked pairs/triples/etc
             if ceil.value in i.value:
                 # Simplify the superposition.
                 for k in ceil.value:
                     if k not in i.value:
                         i.abandon(k)
-            # Pointing pairs/triples
-            if possibly_pointing and value in i.value:
-                if pointing_cells is None:
-                    pointing_cells = []
-                    pointing_groups = list(i.groups)
-                    pointing_groups.remove(self)
-                else:
-                    pointing_groups[:] = [j for j in pointing_groups if j in i.groups]
-                    possibly_pointing = bool(pointing_groups)
-                pointing_cells.append(i)
-            continue
+                break  # Can there be more than one naked pair?
 
-        # Pointing pairs/triples
-        if pointing_groups:
-            for i in pointing_groups:
-                for j in i.cells:
-                    if j not in pointing_cells:
-                        j.abandon(value)
+    def _method_pointing_pairs_triples(self, ceil, value):
+        size = self.data.size
+        if size > self.depth[-value - 1] > size - size ** 0.5:
+            cells = None
+            groups = None
+            for i in self.cells:
+                if i is ceil:
+                    continue
+                if value in i.value:
+                    if cells is None:
+                        cells = []
+                        groups = list(i.groups)
+                        groups.remove(self)
+                    else:
+                        groups = [j for j in groups if j in i.groups]
+                        if not groups:  # True if not empty
+                            break
+                    cells.append(i)
+            else:
+                if groups:
+                    for i in groups:
+                        for j in i.cells:
+                            if j not in cells:
+                                j.abandon(value)
 
 
 class Sudoku:

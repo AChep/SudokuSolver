@@ -122,14 +122,13 @@ class _Group:
                     else:
                         groups = [j for j in groups if j in i.groups]
                         if not groups:  # True if not empty
-                            break
+                            return None
                     cells.append(i)
-            else:
-                if groups:
-                    for i in groups:
-                        for j in i.cells:
-                            if j not in cells:
-                                j.abandon(value)
+            if groups:
+                for i in groups:
+                    for j in i.cells:
+                        if j not in cells:
+                            j.abandon(value)
 
 
 class Sudoku:

@@ -148,36 +148,62 @@ class Sudoku:
         self._data.log = []
         self._data.size = len(sudoku)
         line = list(range(self._data.size))
-        region_size = int(self._data.size ** .5)
-        region = [[i // region_size, i % region_size] for i in line]
 
         # Create the cells.
         # noinspection PyUnusedLocal
         self._cells = [[_Ceil(self._data) for j in line] for i in line]
         self._cells_line = list(itertools.chain.from_iterable(self._cells))
 
+        # Init other parts.
+        self._init_groups()
+        self._init_sudoku(sudoku)
+
+    def _init_groups(self):
+        """
+        Links all cells to groups. Group is a consists of the cells which
+        must have unique values. This method defines the default rules of
+        the Sudoku game.
+        """
+        line = range(self._data.size)
         # Create the groups.
         for j in line:
-            # Add a row.
+            # Add a row. Creating group automatically links the
+            # cells, so no additional moves needed.
             _Group([self._cells[e][j] for e in line], self._data)
             # Add a column.
             _Group([self._cells[j][e] for e in line], self._data)
         # Add regions.
+        region_size = int(self._data.size ** .5)
+        region = [[i // region_size, i % region_size] for i in line]
         for i, j in region:
             r = []
             for a, b in region:
                 x = a + i * region_size
                 y = b + j * region_size
                 r.append([x, y])
-            _Group([self._cells[e[0]][e[1]] for e in r], self._data)
+            _Group([self._cells[x][y] for x, y in r], self._data)
 
+    def _init_sudoku(self, sudoku):
+        """
+        Loads the initial state of the sudoku from the int matrix,
+        passed as an argument. This should not be called manually.
+        :param sudoku:
+        The int matrix that defines the Sudoku. Zero means 'unknown value'.
+        :raises Exception:
+        """
+        line = range(self._data.size)
         # Apply the initial values.
         for i in line:
             for j in line:
                 v = sudoku[i][j]
                 if v:
-                    self._cells[i][j].set(v)
-                    self._cells_line.remove(self._cells[i][j])
+                    ceil = self._cells[i][j]
+                    # Check for correct data.
+                    if -v not in ceil.value:
+                        raise Exception
+                    # Set the value
+                    ceil.set(v)
+                    self._cells_line.remove(ceil)
 
         # Sort the best positions.
         self._cells_line.sort(key=lambda e: len(e.value))

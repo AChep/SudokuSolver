@@ -1,6 +1,6 @@
 SudokuSolver
 ============
-[![Support at gratipay](http://img.shields.io/gratipay/AChep.svg)](https://gratipay.com/AChep/)
+[![Code Climate](https://codeclimate.com/github/AChep/SudokuSolver/badges/gpa.svg)](https://codeclimate.com/github/AChep/SudokuSolver) [![Support at gratipay](http://img.shields.io/gratipay/AChep.svg)](https://gratipay.com/AChep/)
 
 <img alt="Default sudoku" align="right" height="300"
    src="https://github.com/AChep/SudokuSolver/raw/master/art/sudoku.jpg" />

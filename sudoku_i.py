@@ -93,9 +93,7 @@ class _Group:
         """
         if self.depth[-value - 1] == self.data.size:
             for i in self.cells:
-                if i is ceil:
-                    continue
-                if value in i.value:
+                if i is not ceil and value in i.value:
                     # Simplify the superposition.
                     for k in i.value:
                         if k != value:
@@ -104,9 +102,7 @@ class _Group:
 
     def _method_naked_pairs_triples(self, ceil, value):
         for i in self.cells:
-            if i is ceil:
-                continue
-            if ceil.value in i.value:
+            if i is not ceil and ceil.value in i.value:
                 # Simplify the superposition.
                 for k in ceil.value:
                     if k not in i.value:
@@ -116,12 +112,9 @@ class _Group:
     def _method_pointing_pairs_triples(self, ceil, value):
         size = self.data.size
         if size > self.depth[-value - 1] > size - size ** 0.5:
-            cells = None
-            groups = None
+            cells = groups = None
             for i in self.cells:
-                if i is ceil:
-                    continue
-                if value in i.value:
+                if i is not ceil and value in i.value:
                     if cells is None:
                         cells = []
                         groups = list(i.groups)

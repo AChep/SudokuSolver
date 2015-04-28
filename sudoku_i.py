@@ -64,6 +64,7 @@ class _Group:
     def __init__(self, cells, data):
         self.data = data
         self.cells = cells
+        self.queue = []
         # Link this group to the cells.
         for ceil in cells:
             ceil.groups.append(self)
@@ -93,6 +94,10 @@ class _Group:
         self._method_hidden_singles(ceil, value)
         self._method_naked_pairs_plus(ceil, value)
         self._method_pointing_pairs_triples(ceil, value)
+        # Handle queue.
+        for ceil, value in self.queue:
+            ceil.abandon(value)
+        self.queue.clear()
 
     def _method_hidden_singles(self, ceil, value):
         """
@@ -108,7 +113,7 @@ class _Group:
                     # Simplify the superposition.
                     for k in i.value:
                         if k != value:
-                            i.abandon(k)
+                            self._post_abandon(i, k)
                     break
 
     def _method_naked_pairs_plus(self, ceil, value):
@@ -131,7 +136,7 @@ class _Group:
                 for j in self.cells:
                     if j not in s:
                         for k in i.value:
-                            j.abandon(k)
+                            self._post_abandon(j, k)
             s.clear()
 
     def _method_pointing_pairs_triples(self, ceil, value):
@@ -153,7 +158,10 @@ class _Group:
                 for i in groups:
                     for j in i.cells:
                         if j not in cells:
-                            j.abandon(value)
+                            self._post_abandon(j, value)
+
+    def _post_abandon(self, ceil, value):
+        self.queue.append([ceil, value])
 
 
 class Sudoku:

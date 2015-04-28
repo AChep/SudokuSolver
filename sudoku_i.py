@@ -32,6 +32,8 @@ class _Ceil:
         # Notify the groups.
         for i in self.groups:
             i.on_ceil_value_set(self, value)
+        # Clean-up the ghost.
+        self.ghost = None
 
     def abandon(self, value):
         for i, j in enumerate(self.value):

@@ -50,6 +50,15 @@ class _Ceil:
             i.on_ceil_value_abandoned(self, value)
         return True
 
+    def issubset(self, ceil):
+        """
+        Report whether another super-position contains this super-position.
+        """
+        for v in ceil.value:
+            if v not in self.value:
+                return False
+        return True
+
 
 class _Group:
     def __init__(self, cells, data):
@@ -82,7 +91,7 @@ class _Group:
         self.depth[-value - 1] += 1
         # Use different methods to choose the best ceil/value.
         self._method_hidden_singles(ceil, value)
-        self._method_naked_pairs_triples(ceil, value)
+        self._method_naked_pairs_plus(ceil, value)
         self._method_pointing_pairs_triples(ceil, value)
 
     def _method_hidden_singles(self, ceil, value):
@@ -102,14 +111,28 @@ class _Group:
                             i.abandon(k)
                     break
 
-    def _method_naked_pairs_triples(self, ceil, value):
+    def _method_naked_pairs_plus(self, ceil, value):
+        if len(ceil.value) >= self.data.size - 1:
+            # If the size of a super-position of this ceil is
+            # equal to `size - 1` then Hidden singles method will
+            # deal with it.
+            return
+        s = []
+        cells = []
         for i in self.cells:
-            if i is not ceil and ceil.value in i.value:
-                # Simplify the superposition.
-                for k in ceil.value:
-                    if k not in i.value:
-                        i.abandon(k)
-                break  # Can there be more than one naked pair?
+            if i is not ceil and len(i.value) < self.data.size - 1:
+                if ceil.issubset(i):
+                    cells.append(i)  # Have to re-check this one.
+        for i in cells:
+            for j in self.cells:
+                if i.issubset(j):
+                    s.append(j)
+            if len(s) == len(i.value):
+                for j in self.cells:
+                    if j not in s:
+                        for k in i.value:
+                            j.abandon(k)
+            s.clear()
 
     def _method_pointing_pairs_triples(self, ceil, value):
         size = self.data.size

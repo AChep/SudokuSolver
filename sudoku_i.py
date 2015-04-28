@@ -132,11 +132,15 @@ class _Group:
             for j in self.cells:
                 if i.issubset(j):
                     s.append(j)
-            if len(s) == len(i.value):
+            length = len(s)
+            if length == len(i.value):
+                p = 0
                 for j in self.cells:
-                    if j not in s:
+                    if p == length or j is not s[p]:
                         for k in i.value:
                             self._post_abandon(j, k)
+                    else:
+                        p += 1
             s.clear()
 
     def _method_pointing_pairs_triples(self, ceil, value):

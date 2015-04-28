@@ -54,6 +54,8 @@ class _Ceil:
         """
         Report whether another super-position contains this super-position.
         """
+        if ceil is self:
+            return True
         for v in ceil.value:
             if v not in self.value:
                 return False
@@ -92,7 +94,7 @@ class _Group:
         self.depth[-value - 1] += 1
         # Use different methods to choose the best ceil/value.
         self._method_hidden_singles(ceil, value)
-        self._method_naked_pairs_plus(ceil, value)
+        self._method_naked_candidates(ceil, value)
         self._method_pointing_pairs_triples(ceil, value)
         # Handle queue.
         for ceil, value in self.queue:
@@ -116,16 +118,42 @@ class _Group:
                             self._post_abandon(i, k)
                     break
 
-    def _method_naked_pairs_plus(self, ceil, value):
-        if len(ceil.value) >= self.data.size - 1:
-            # If the size of a super-position of this ceil is
-            # equal to `size - 1` then Hidden singles method will
-            # deal with it.
+    def _method_naked_candidates(self, ceil, value):
+        """
+        Naked Pair.
+        A Naked Pair (also known as a Conjugate Pair) is a set of two candidate
+        numbers sited in two cells that belong to at least one unit in common.
+        That is they reside in the same row, box or column.
+
+        Naked Triples
+        A Naked Triple is slightly more complicated because it does not always
+        imply three numbers each in three cells.
+        Any group of three cells in the same unit that contain IN TOTAL three
+        candidates is a Naked Triple. Each cell can have two or three numbers,
+        as long as in combination all three cells have only three numbers.
+        When this happens, the three candidates can be removed from all other
+        cells in the same unit.
+
+        Naked Quads
+        A Naked Quad is rarer, especially in its full form but still useful if they
+        can be spotted. The same logic from Naked Triples applies, but the reason
+        it is so rare is because if a Quad is present the remaining cells are
+        more like to be a Triple or Pair and the solver will highlight those first.
+
+        Read more: http://www.sudokuwiki.org/Naked_Candidates
+        """
+        if len(ceil.value) == self.data.size - 1:
+            # 1. The length can't be equal to the size.
+            # 2. If the length is equal to a `size - 1`
+            # then it's up to a Naked Singles method to
+            # handle it
             return
         s = []
         cells = []
+        # Find all the cells that are depending on the
+        # changed one.
         for i in self.cells:
-            if i is not ceil and len(i.value) < self.data.size - 1:
+            if i is not ceil and len(i.value) < self.data.size - 1:  # Ignore Naked Singles
                 if ceil.issubset(i):
                     cells.append(i)  # Have to re-check this one.
         for i in cells:
@@ -134,14 +162,26 @@ class _Group:
                     s.append(j)
             length = len(s)
             if length == len(i.value):
-                p = 0
-                for j in self.cells:
-                    if p == length or j is not s[p]:
-                        for k in i.value:
-                            self._post_abandon(j, k)
-                    else:
-                        p += 1
+                for v in i.value:
+                    size = self.data.size - self.depth[-v - 1] + 1
+                    if size == length:
+                        # This value exists only in our naked candidates,
+                        # so there's no need to try to remove it from others.
+                        continue
+                    # Remove the value from an un-linked cells.
+                    p = 0
+                    for j in self.cells:
+                        if p == length or j is not s[p]:
+                            size -= 1
+                            self._post_abandon(j, v)
+                            if not size:
+                                # No cells left in which it's possible to
+                                # abandon the value.
+                                break
+                        else:
+                            p += 1
             s.clear()
+        del s, cells
 
     def _method_pointing_pairs_triples(self, ceil, value):
         size = self.data.size

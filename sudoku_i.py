@@ -94,6 +94,7 @@ class _Group:
         self.depth[-value - 1] += 1
         # Use different methods to choose the best ceil/value.
         self._method_hidden_singles(ceil, value)
+        self._method_hidden_candidates(ceil, value)
         self._method_naked_candidates(ceil, value)
         self._method_pointing_pairs_triples(ceil, value)
         # Handle queue.
@@ -117,6 +118,39 @@ class _Group:
                         if k != value:
                             self._post_abandon(i, k)
                     break
+
+    def _method_hidden_candidates(self, ceil, value):
+        """
+        Read more: http://www.sudokuwiki.org/Hidden_Candidates
+        """
+        cells = []
+        for n in range(2, int(self.data.size ** 0.5) * 2):
+            # Get
+            base_elements = []
+            for i, depth in enumerate(self.depth):
+                if depth == self.data.size - n + 1:
+                    base_elements.append(-i - 1)
+            for v in base_elements:
+                merge = [0] * self.data.size
+                for ceil in self.cells:
+                    if v in ceil.value:
+                        cells.append(ceil)
+                        for k in ceil.value:
+                            merge[-k - 1] += 1
+                size = 0
+                for i, m in enumerate(merge):
+                    if m != 0 and self.depth[i] >= self.data.size - n + 1:
+                        size += 1
+                        merge[i] = 0
+                        if self.depth[i] != self.data.size - m + 1:
+                            break
+                else:
+                    if size == n:
+                        for i, k in enumerate(merge):
+                            if k != 0:
+                                for ceil in cells:
+                                    self._post_abandon(ceil, -i - 1)
+                cells.clear()
 
     def _method_naked_candidates(self, ceil, value):
         """

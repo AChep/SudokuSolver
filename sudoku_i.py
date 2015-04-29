@@ -135,6 +135,8 @@ class _Group:
                         cells.append(ceil)
                         for k in ceil.value:
                             merge[-k - 1] += 1
+                        if len(cells) == n:
+                            break
                 size = 0
                 for i, m in enumerate(merge):
                     if m != 0 and self.depth[i] >= self.data.size - n + 1:

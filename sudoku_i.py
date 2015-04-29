@@ -124,10 +124,7 @@ class _Group:
         cells = []
         for n in range(2, int(self.data.size ** 0.5) * 2):
             # Get
-            base_elements = []
-            for i, depth in enumerate(self.depth):
-                if depth == self.data.size - n + 1:
-                    base_elements.append(-i - 1)
+            base_elements = [-i - 1 for i, depth in enumerate(self.depth) if depth == self.data.size - n + 1]
             for v in base_elements:
                 merge = [0] * self.data.size
                 for ceil in self.cells:

@@ -88,11 +88,9 @@ class _Group:
             i.abandon(-value)
 
     def on_ceil_value_abandoned_pre(self, ceil, value):
-        pass
+        self.depth[-value - 1] += 1
 
     def on_ceil_value_abandoned(self, ceil, value):
-        self.depth[-value - 1] += 1
-        # Use different methods to choose the best ceil/value.
         self._method_hidden_singles(ceil, value)
         self._method_hidden_candidates(ceil, value)
         self._method_naked_candidates(ceil, value)

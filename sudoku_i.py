@@ -96,7 +96,7 @@ class _Group:
         self._method_hidden_singles(ceil, value)
         self._method_hidden_candidates(ceil, value)
         self._method_naked_candidates(ceil, value)
-        self._method_pointing_pairs_triples(ceil, value)
+        self._method_intersection_removal(ceil, value)
         # Handle queue.
         for ceil, value in self.queue:
             ceil.abandon(value)
@@ -217,7 +217,7 @@ class _Group:
             s.clear()
         del s, cells
 
-    def _method_pointing_pairs_triples(self, ceil, value):
+    def _method_intersection_removal(self, ceil, value):
         size = self.data.size
         if size > self.depth[-value - 1] > size - size ** 0.5:
             cells = groups = None

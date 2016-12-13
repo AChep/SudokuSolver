@@ -1,3 +1,5 @@
+""" Main file for the solver """
+
 # Copyright (C) 2015 Artem Chepurnoy <artemchep@gmail.com>
 #
 # This script is published under the terms of the MIT license.
@@ -8,7 +10,7 @@
 
 from sudoku import Sudoku
 
-s = Sudoku()
-print(s.clue())
-print(s.solve())
-print(Sudoku.format(s.solution))
+S = Sudoku()
+print(S.clue())
+print(S.solve())
+print(Sudoku.format(S.solution))
